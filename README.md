@@ -1,3 +1,4 @@
+
 # Funtiocal programming with es6
 
 ### Head
@@ -22,41 +23,47 @@ Return all but the first item in an array.
 ```
 const tail = ([, ...xs]) => xs
 ```
-
+example:
+```
 const array = [1,2,3,4,5]
 tail(array) // [2,3,4,5]
-
 ```
+
 ---
 
 ### Def
 Return if argument supplied is defined.
-```
 
+```
 const def = x => typeof x !== 'undefined'
 const defined = 'this is defined'
+```
+example:
+```
 def(defined) // true
 def(doesntExist) // false
-
+```
 ---
 
-```
+
 ### Undef
 Return if argument supplied is undefined.
-```
 
+```
 const undef = x => !def(x)
 
+```
+example:
+```
 const defined = 'this is defined'
 undef(defined) // false
 undef(doesntExist) // true
-
+```
 ---
 
-```
 ### Copy
-```
 
+```
 const copy = array => [...array]
 
 let array = [1,2,3,4,5]
@@ -67,18 +74,21 @@ array // [1,2,3,4,5]
 copied // [1,2,3,4,5,6]
 
 ```
-
+---
+### Reverse
 ```
-
 const reverse = ([x, ...xs]) => def(x) ? [...reverse(xs), x] : []
+```
 Example usage:
 
+```
 const array = [1,2,3,4,5]
 reverse(array) // [5,4,3,2,1]
-
 ```
+
 Array.reverse() is okay, but it modifies the value in place which is a side-effect. Consider the following:
 
+```
 const array = [1,2,3,4,5]
 
 const newArray = array.reverse() // [5,4,3,2,1]
@@ -89,37 +99,41 @@ const array2 = [1,2,3,4,5]
 
 const newArray2 = reverse(array2) // [5,4,3,2,1]
 array2 // [1,2,3,4,5]
+```
 
 ---
 
 ### First
 Returns a new array that contains the first n items of the given array.
+
 ```
-
-const first = ([x, ...xs], n = 1) => def(x) && n ? [x, ...first(xs, n - 1)] : []
-
+const first = ([x, ...xs], n = 1) => def(x) && n
+								     ? [x, ...first(xs, n - 1)
+								     : []
+								     			  
 const array = [1,2,3,4,5]
 first(array, 3) // [1,2,3]
+```
 
 ---
 
-```
 ### Last
 Returns a new array that contains the last n items of the given array.
-```
 
+```
 const last = (xs, n = 1) => reverse(first(reverse(xs), n))
 
 const array = [1,2,3,4,5]
 last(array, 3) // [3,4,5]
 
 ```
+
 ---
 
 ### Slice
 Returns a new array with value inserted at given index.
-```
 
+```
 const slice = ([x, ...xs], i, y, curr = 0) => def(x)
 ? curr === i
 ? [y, x, ...slice(xs, i, y, curr + 1)]
@@ -133,12 +147,13 @@ const slice = ([x, ...xs], i, y, curr = 0) => def(x)
 : []
 
 ```
+
 ---
 
 ### Flatten
 Combines nested arrays into a single array.
-```
 
+```
 const flatten = ([x, ...xs]) => def(x)
 ? isArray(x) ? [...flatten(x), ...flatten(xs)] : [x, ...flatten(xs)]
 : []
@@ -148,6 +163,7 @@ const array2 = [4,[5,[6]]]
 flatten([array1, array2]) // [1,2,3,4,5,6]
 
 ```
+
 ---
 
 ### Swap
@@ -468,3 +484,42 @@ divide(100,2,5) // 10
 ```
 
 ```
+
+
+Promise chain 
+
+const getLorem = (_ => {
+  let counter = 0
+
+  return url => {
+    const internalCounter = counter++
+    console.log(internalCounter + ' :fetch started')
+    return fetch(url)
+      .then(content => {
+        console.log('resolved -> ' + internalCounter)
+        return content.json()
+      })
+      .then(arr => String(arr[0]).slice(0, 20))
+  }
+})()
+
+const delay = ms => new Promise(resolve => setTimeout(() => resolve({}), ms))
+
+const chainPromiseFlow = (promisesArray, callback) =>
+  promisesArray.reduce(
+    (chain, promise) =>
+      chain
+        .then(() => promise)
+        .then(callback)
+        .then(() => delay(1000)),
+    Promise.resolve()
+  )
+
+const urls = ['https://baconipsum.com/api/?type=meat-and-filler'].reduce(
+  (acc, curr) => acc.concat([curr, curr, curr]),
+  []
+)
+
+const promises = urls.map(getLorem)
+
+chainPromiseFlow(promises, console.log)
