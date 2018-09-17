@@ -1,5 +1,5 @@
 
-# Funtiocal programming with es6
+# Functional programming with es6
 
 ### Head
 
