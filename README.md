@@ -635,3 +635,33 @@ const chainPromiseFlow = (promisesArray, callback) =>
 	    Promise.resolve()
   )
 ```
+
+---
+
+### Running promises in sequence
+This can happen in the case of an event listener for example.
+
+```
+let chain = Promise.resolve()
+
+const extendChain = (fn, cb) => {
+  const newChain = chain.then(fn()).then(cb)
+  chain = newChain
+}
+
+```
+
+Usage: 
+
+```
+extendChain(() => fakeFetch(url1), console.log)
+
+extendChain(() => fakeFetch(url2), console.log)
+
+extendChain(() => fakeFetch(url3), console.log)
+
+// logs: url1, url2, url3
+
+```
+
+---
